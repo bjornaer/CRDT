@@ -1,4 +1,4 @@
-# CRDT [![Go Report Card](https://goreportcard.com/badge/github.com/bjornaer/crdt)](https://goreportcard.com/report/github.com/bjornaer/crdt) ![tests](https://github.com/bjornaer/crdt/actions/workflows/push.yaml/badge.svg)
+# CRDT [![Go Report Card](https://goreportcard.com/badge/github.com/bjornaer/crdt)](https://goreportcard.com/report/github.com/bjornaer/crdt) ![tests](https://github.com/bjornaer/crdt/actions/workflows/push.yaml/badge.svg)[![HitCount](https://hits.dwyl.com/bjornaer/crdt.svg?style=flat-square)](http://hits.dwyl.com/bjornaer/crdt)
 
 ### Introduction
 Conflict-Free Replicated Data Types (CRDTs) are data structures that power real-time collaborative applications in
