@@ -129,8 +129,8 @@ func TestLWWGraph_AddEdge(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	if !g.EdgeExists(v1,v3) {
-		t.Errorf("Missing edge, got:[ %v, %v ], expected: [ %v, %v ].", edges1,edges3,[]string{"vertex2", "vertex3"}, []string{"vertex1", "vertex2"})
+	if !g.EdgeExists(v1, v3) {
+		t.Errorf("Missing edge, got:[ %v, %v ], expected: [ %v, %v ].", edges1, edges3, []string{"vertex2", "vertex3"}, []string{"vertex1", "vertex2"})
 	}
 }
 
@@ -144,15 +144,15 @@ func TestLWWGraph_RemoveEdge(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	if g.EdgeExists(v1,v2) {
-		t.Errorf("Extra edge found, got:[ %v, %v ], expected: [ %v, %v ].", edges1,edges2,[]string{}, []string{"vertex3"})
+	if g.EdgeExists(v1, v2) {
+		t.Errorf("Extra edge found, got:[ %v, %v ], expected: [ %v, %v ].", edges1, edges2, []string{}, []string{"vertex3"})
 	}
 }
 
 func TestLWWGraph_EdgeExists(t *testing.T) {
 	g := setupTestGraph()
 	tests := []struct {
-		vertices   []string
+		vertices []string
 		expected bool
 	}{
 		{[]string{"vertex1", "vertex2"}, true},
@@ -187,10 +187,10 @@ func TestLWWGraph_FindPath(t *testing.T) {
 	disconnectedG := setupTestGraph()
 	disconnectedG.RemoveEdge("vertex1", "vertex2")
 	tests := []struct {
-		name string
-		graph   *crdt.LWWGraph
-		from string
-		target string
+		name     string
+		graph    *crdt.LWWGraph
+		from     string
+		target   string
 		expected []string
 	}{
 		{"simple graph", simpleG, "vertex1", "vertex3", []string{"vertex1", "vertex2", "vertex3"}},
@@ -217,7 +217,7 @@ func TestLWWGraph_Merge(t *testing.T) {
 	nv := "new_vertex"
 	g2.RemoveVertex(v2)
 	g1.AddVertex(v2)
-	g2.AddEdge(v1,v3)
+	g2.AddEdge(v1, v3)
 	g2.AddVertex(nv)
 	g1.RemoveVertex(nv)
 	err := g1.Merge(g2)

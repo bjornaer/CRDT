@@ -147,7 +147,7 @@ func (g *LWWGraph) findPathRecursive(
 
 	edges, err := g.edges[v1].Get()
 	if err != nil {
-		return nil,nil, err
+		return nil, nil, err
 	}
 
 	for _, vertex := range edges {

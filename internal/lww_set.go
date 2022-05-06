@@ -8,7 +8,7 @@ type LastWriterWinsSet interface {
 	Add(interface{}, time.Time) error
 	Remove(interface{}, time.Time) error
 	Exists(interface{}) bool
-	Get() ([]interface{},error)
+	Get() ([]interface{}, error)
 	Merge(LastWriterWinsSet) error
 	getAdditions() timeSet
 	getRemovals() timeSet
@@ -25,7 +25,7 @@ func (s *LWWSet) Add(value interface{}, t time.Time) error {
 	return s.additions.add(value, t)
 }
 
-func (s*LWWSet) getAdditions() timeSet {
+func (s *LWWSet) getAdditions() timeSet {
 	return s.additions
 }
 
@@ -34,7 +34,7 @@ func (s *LWWSet) Remove(value interface{}, t time.Time) error {
 	return s.removals.add(value, t)
 }
 
-func (s*LWWSet) getRemovals() timeSet {
+func (s *LWWSet) getRemovals() timeSet {
 	return s.removals
 }
 
@@ -116,4 +116,3 @@ func NewLWWSet() LastWriterWinsSet {
 		removals:  newTimeSet(),
 	}
 }
-

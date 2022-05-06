@@ -41,11 +41,11 @@ away from the user.
 **NOTE**
 
 To read documentation on the public API of this package please install dependencies with 
-```
+```go
 go mod download
 ``` 
 and run the command 
-```
+```go
 godoc -http=:6060
 ``` 
 and [access localhost to read the docs](http://localhost:6060/pkg/github.com/bjornaer/crdt/).
@@ -59,11 +59,6 @@ To run tests
 ```go
 go test ./...
 ```
-### Side notes
-
-I actually thought of providing the package CRDT and an interface for what a CRDT is and then have the 
-graph implement that, as well as the LWW Set, but it seemed to move away form the exercise and I already had my code
-organized, so I would need to reorganize the code and take longer to deliver this `:D`
 
 ### Bibliography
 

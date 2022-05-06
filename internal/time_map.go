@@ -1,9 +1,8 @@
 package internal
 
-
 import (
-"sync"
-"time"
+	"sync"
+	"time"
 )
 
 type timeSet interface {
@@ -62,5 +61,3 @@ func newTimeSet() timeSet {
 		elements: make(map[interface{}]time.Time),
 	}
 }
-
-

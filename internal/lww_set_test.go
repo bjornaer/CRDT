@@ -85,7 +85,7 @@ func TestLWWSet_Remove(t *testing.T) {
 		t.Errorf("Unexpected error: %v", err)
 	}
 	expected := []interface{}{"item1", "item2"}
-	if s.Exists(i) || !setsAreEqual(items, expected){
+	if s.Exists(i) || !setsAreEqual(items, expected) {
 		t.Errorf("Extra item found, got: %v, expected: %v.", items, expected)
 	}
 }
