@@ -1,4 +1,4 @@
-# LWW Graph
+# CRDT
 
 ### Introduction
 Conflict-Free Replicated Data Types (CRDTs) are data structures that power real-time collaborative applications in
@@ -23,8 +23,9 @@ An advantage of LWW-Element-Set is that it allows an element to be reinserted af
 
 ### Package
 
-This package implements a `LWW-Graph` structure using a `LWW-Element-Set` to represent its set of vertices 
-while for its edges it uses a `mapping of a vertex to a LWW-Element-Set` representing all edges of said vertex.
+This package implements a `CRDT` interface that enables use of the `LWW-Graph` structure using a `LWW-Element-Set` to represent its set of vertices while for its edges it uses a `mapping of a vertex to a LWW-Element-Set` representing all edges of said vertex.
+
+The package also exposes the option to simply use a `LWW-Element-Set`.
 
 As stated in the previous section the `LWW-Element-Set` contains both `Additions` and `Removals` sets, 
 to where we monotonically add graph elements marked to be added or removed. 
@@ -33,9 +34,10 @@ The `Time Map` is an abstraction of a Go Map in which we only allow the operatio
 and map those elements to a timestamp in the moment of the addition.
 Thus, only allowing items to be added to both the `Adittions` and `Removals` set.
 
+### Roadmap
 
-All the underlying structures and methods for the `LWW-Graph` are made as an `internal` package in order to abstract them 
-away from the user.
+I intend on adding support for a more varied options of backends such as Redis
+I also intend on keep adding more types of CRDTs to be used besides the `LWW-Set` and `LWW-Graph`
 
 ---
 **NOTE**

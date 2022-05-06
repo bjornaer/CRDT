@@ -1,19 +1,20 @@
-package crdt_test
+package graph_test
 
 // We add the test file in a separate package to keep testing and actual implementation details separate
 // By doing so, in the tests we will only have access to the public part of our code
 
 import (
-	"github.com/bjornaer/crdt"
 	"testing"
+
+	graph "github.com/bjornaer/crdt/internal/graph"
 )
 
-func setupTestGraph() *crdt.LWWGraph {
+func setupTestGraph() graph.LastWriterWinsGraph {
 	v1 := "vertex1"
 	v2 := "vertex2"
 	v3 := "vertex3"
 
-	g := crdt.NewLWWGraph()
+	g := graph.NewLWWGraph()
 	g.AddVertex(v1)
 	g.AddVertex(v2)
 	g.AddVertex(v3)
@@ -188,7 +189,7 @@ func TestLWWGraph_FindPath(t *testing.T) {
 	disconnectedG.RemoveEdge("vertex1", "vertex2")
 	tests := []struct {
 		name     string
-		graph    *crdt.LWWGraph
+		graph    graph.LastWriterWinsGraph
 		from     string
 		target   string
 		expected []string

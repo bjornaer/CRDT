@@ -1,26 +1,51 @@
-// Package crdt provides a graph based on LWW set implementations
-package crdt
+package graph
 
 import (
 	"errors"
 	"fmt"
-	"github.com/bjornaer/crdt/internal"
 	"sync"
 	"time"
+
+	set "github.com/bjornaer/crdt/internal/set"
 )
+
+type LastWriterWinsGraph interface {
+	AddVertex(interface{}) error
+	GetAllVertices() ([]interface{}, error)
+	RemoveVertex(interface{}) error
+	VertexExists(interface{}) bool
+	AddEdge(v1, v2 interface{}) error
+	RemoveEdge(v1, v2 interface{}) error
+	EdgeExists(v1, v2 interface{}) bool
+	GetVertexEdges(v interface{}) ([]interface{}, error)
+	FindPath(v1, v2 interface{}) ([]interface{}, error)
+	Merge(LastWriterWinsGraph) error
+	getV() set.LastWriterWinsSet
+	getE() map[interface{}]set.LastWriterWinsSet
+}
 
 // LWWGraph is a structure for a graph with vertices and edges based on LWW sets
 type LWWGraph struct {
-	vertices internal.LastWriterWinsSet
-	edges    map[interface{}]internal.LastWriterWinsSet
+	vertices set.LastWriterWinsSet
+	edges    map[interface{}]set.LastWriterWinsSet
 	mutex    sync.RWMutex // Maps in Go are not thread safe by default and that's why we use a mutex
 }
 
 // NewLWWGraph returns an empty LWW based LWWGraph
-func NewLWWGraph() *LWWGraph {
+func NewLWWGraph() LastWriterWinsGraph {
 	return &LWWGraph{
-		vertices: internal.NewLWWSet(),
+		vertices: set.NewLWWSet(),
 	}
+}
+
+// access private vertices
+func (g *LWWGraph) getV() set.LastWriterWinsSet {
+	return g.vertices
+}
+
+// access private edges
+func (g *LWWGraph) getE() map[interface{}]set.LastWriterWinsSet {
+	return g.edges
 }
 
 // AddVertex adds a vertex to the graph
@@ -55,17 +80,17 @@ func (g *LWWGraph) AddEdge(v1, v2 interface{}) error {
 	}
 
 	if g.edges == nil {
-		g.edges = make(map[interface{}]internal.LastWriterWinsSet)
+		g.edges = make(map[interface{}]set.LastWriterWinsSet)
 	}
 	if _, ok := g.edges[v1]; !ok {
-		g.edges[v1] = internal.NewLWWSet()
+		g.edges[v1] = set.NewLWWSet()
 	}
 	err := g.edges[v1].Add(v2, time.Now())
 	if err != nil {
 		return err
 	}
 	if _, ok := g.edges[v2]; !ok {
-		g.edges[v2] = internal.NewLWWSet()
+		g.edges[v2] = set.NewLWWSet()
 	}
 	err = g.edges[v2].Add(v1, time.Now())
 	if err != nil {
@@ -80,17 +105,17 @@ func (g *LWWGraph) RemoveEdge(v1, v2 interface{}) error {
 	defer g.mutex.Unlock()
 
 	if g.edges == nil {
-		g.edges = make(map[interface{}]internal.LastWriterWinsSet)
+		g.edges = make(map[interface{}]set.LastWriterWinsSet)
 	}
 	if _, ok := g.edges[v1]; !ok {
-		g.edges[v1] = internal.NewLWWSet()
+		g.edges[v1] = set.NewLWWSet()
 	}
 	err := g.edges[v1].Remove(v2, time.Now())
 	if err != nil {
 		return err
 	}
 	if _, ok := g.edges[v2]; !ok {
-		g.edges[v2] = internal.NewLWWSet()
+		g.edges[v2] = set.NewLWWSet()
 	}
 	err = g.edges[v2].Remove(v1, time.Now())
 	if err != nil {
@@ -120,7 +145,7 @@ func (g *LWWGraph) FindPath(v1, v2 interface{}) ([]interface{}, error) {
 		return nil, fmt.Errorf("cannot find path, missing node in graph: %v", v2)
 	}
 
-	seen := internal.NewLWWSet()
+	seen := set.NewLWWSet()
 	var emptyPath []interface{}
 	_, path, err := g.findPathRecursive(v1, v2, seen, emptyPath)
 	if err != nil {
@@ -133,8 +158,8 @@ func (g *LWWGraph) FindPath(v1, v2 interface{}) ([]interface{}, error) {
 func (g *LWWGraph) findPathRecursive(
 	v1,
 	v2 interface{},
-	seen internal.LastWriterWinsSet,
-	path []interface{}) (internal.LastWriterWinsSet, []interface{}, error) {
+	seen set.LastWriterWinsSet,
+	path []interface{}) (set.LastWriterWinsSet, []interface{}, error) {
 	err := seen.Add(v1, time.Now())
 	path = append(path, v1)
 	if err != nil {
@@ -167,17 +192,17 @@ func (g *LWWGraph) findPathRecursive(
 }
 
 // Merge another LWWGraph into its instance by merging vertices and edges
-func (g *LWWGraph) Merge(other *LWWGraph) error {
+func (g *LWWGraph) Merge(other LastWriterWinsGraph) error {
 	if other == nil {
 		return errors.New("cannot merge, other graph is nil")
 	}
 
-	err := g.vertices.Merge(other.vertices)
+	err := g.vertices.Merge(other.getV())
 	if err != nil {
 		return err
 	}
 
-	for otherVertex, otherEdges := range other.edges {
+	for otherVertex, otherEdges := range other.getE() {
 		if currentEdges, ok := g.edges[otherVertex]; ok {
 			err = currentEdges.Merge(otherEdges)
 			if err != nil {

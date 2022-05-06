@@ -1,20 +1,21 @@
-package internal_test
+package set_test
 
 // We add the test file in a separate package to keep testing and actual implementation details separate
 // By doing so, in the tests we will only have access to the public part of our code
 
 import (
-	"github.com/bjornaer/crdt/internal"
 	"testing"
 	"time"
+
+	set "github.com/bjornaer/crdt/internal/set"
 )
 
-func setupTestSet() internal.LastWriterWinsSet {
+func setupTestSet() set.LastWriterWinsSet {
 	i1 := "item1"
 	i2 := "item2"
 	i3 := "item3"
 
-	s := internal.NewLWWSet()
+	s := set.NewLWWSet()
 	s.Add(i1, time.Now())
 	s.Add(i2, time.Now())
 	s.Add(i3, time.Now())
