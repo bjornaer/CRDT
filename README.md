@@ -41,8 +41,8 @@ I also intend on keep adding more types of CRDTs to be used besides the `LWW-Set
 
 ---
 **NOTE**
-
 To read documentation on the public API [can be found here](https://pkg.go.dev/github.com/bjornaer/crdt)
+
 ---
 
 ### Run tests
