@@ -5,22 +5,22 @@ import (
 	"time"
 )
 
-type TimeSet interface {
-	Add(interface{}, time.Time) error
-	AddedAt(interface{}) (time.Time, bool)
-	Each(func(interface{}, time.Time) error) error
+type TimeSet[T comparable] interface {
+	Add(T, time.Time) error
+	AddedAt(T) (time.Time, bool)
+	Each(func(T, time.Time) error) error
 }
 
 // TimeMap is an implementation of a timeSet that uses a map data structure. We map items to timestamps.
-type TimeMap struct {
-	elements map[interface{}]time.Time
+type TimeMap[T comparable] struct {
+	elements map[T]time.Time
 	mutex    sync.RWMutex // Maps in Go are not thread safe by default and that's why we use a mutex
 }
 
 // Add an element in the set if one of the following condition is met:
 // - Given element does not exist yet
 // - Given element already exists but with a lesser timestamp than the given one
-func (s *TimeMap) Add(value interface{}, t time.Time) error {
+func (s *TimeMap[T]) Add(value T, t time.Time) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
 	addedAt, ok := s.elements[value]
@@ -34,7 +34,7 @@ func (s *TimeMap) Add(value interface{}, t time.Time) error {
 //
 // The second return value (bool) indicates whether the element exists or not
 // If the given element does not exist, the second return (bool) is false
-func (s *TimeMap) AddedAt(value interface{}) (time.Time, bool) {
+func (s *TimeMap[T]) AddedAt(value T) (time.Time, bool) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	t, ok := s.elements[value]
@@ -43,7 +43,7 @@ func (s *TimeMap) AddedAt(value interface{}) (time.Time, bool) {
 
 // Each traverses the items in the Set, calling the provided function
 // for each element/timestamp association
-func (s *TimeMap) Each(f func(element interface{}, addedAt time.Time) error) error {
+func (s *TimeMap[T]) Each(f func(element T, addedAt time.Time) error) error {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
 	for element, addedAt := range s.elements {
@@ -56,8 +56,8 @@ func (s *TimeMap) Each(f func(element interface{}, addedAt time.Time) error) err
 }
 
 // newTimeSet returns an empty map-backed implementation of the time set interface
-func NewTimeSet() TimeSet {
-	return &TimeMap{
-		elements: make(map[interface{}]time.Time),
+func NewTimeSet[T comparable]() TimeSet[T] {
+	return &TimeMap[T]{
+		elements: make(map[T]time.Time),
 	}
 }

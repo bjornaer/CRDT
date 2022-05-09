@@ -6,7 +6,8 @@ distributed systems. CRDTs can be replicated across systems, they can be updated
 without coordination between the replicas, and it is always mathematically possible to resolve inconsistencies that
 might result.
 
-In this codebase we implement a LWW-Element-Set based Graph.
+In other (more practical) words: CRDTs are a certain form of data types that when replicated across several nodes over a network achieve eventual consistency without the need for a consensus round
+
 ### Last-Write-Wins-Element-Set
 LWW-Element-Set is similar to 
 [2P-Set](https://en.wikipedia.org/wiki/Conflict-free_replicated_data_type#2P-Set_(Two-Phase_Set)) 

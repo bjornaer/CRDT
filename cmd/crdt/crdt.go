@@ -5,15 +5,15 @@ import (
 	s "github.com/bjornaer/crdt/internal/set"
 )
 
-type CRDT struct {
-	LWWGraph g.LastWriterWinsGraph
-	LWWSet   s.LastWriterWinsSet
+type CRDT[T comparable] struct {
+	LWWGraph g.LastWriterWinsGraph[T]
+	LWWSet   s.LastWriterWinsSet[T]
 }
 
 // NewLWWSet returns an implementation of a LastWriterWinsSet
-func NewCRDT() *CRDT {
-	return &CRDT{
-		LWWSet:   s.NewLWWSet(),
-		LWWGraph: g.NewLWWGraph(),
+func NewCRDT[T comparable]() *CRDT[T] {
+	return &CRDT[T]{
+		LWWSet:   s.NewLWWSet[T](),
+		LWWGraph: g.NewLWWGraph[T](),
 	}
 }

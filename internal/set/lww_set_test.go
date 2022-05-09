@@ -10,12 +10,12 @@ import (
 	set "github.com/bjornaer/crdt/internal/set"
 )
 
-func setupTestSet() set.LastWriterWinsSet {
+func setupTestSet() set.LastWriterWinsSet[string] {
 	i1 := "item1"
 	i2 := "item2"
 	i3 := "item3"
 
-	s := set.NewLWWSet()
+	s := set.NewLWWSet[string]()
 	s.Add(i1, time.Now())
 	s.Add(i2, time.Now())
 	s.Add(i3, time.Now())
@@ -23,7 +23,7 @@ func setupTestSet() set.LastWriterWinsSet {
 }
 
 // checks element is contained within set
-func contains(s []interface{}, e interface{}) bool {
+func contains[T comparable](s []T, e T) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -33,7 +33,7 @@ func contains(s []interface{}, e interface{}) bool {
 }
 
 // checks for set equality -- independent of order
-func setsAreEqual(s1, s2 []interface{}) bool {
+func setsAreEqual[T comparable](s1, s2 []T) bool {
 	if len(s1) != len(s2) {
 		return false
 	}
@@ -56,7 +56,7 @@ func TestLWWSet_Add(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	expected := []interface{}{"item1", "item2", "item3", "item4"}
+	expected := []string{"item1", "item2", "item3", "item4"}
 	if !s.Exists(i) || !setsAreEqual(items, expected) {
 		t.Errorf("Missing item, got: %v, expected: %v.", items, expected)
 	}
@@ -68,7 +68,7 @@ func TestLWWSet_Get(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	expected := []interface{}{"item1", "item2", "item3"}
+	expected := []string{"item1", "item2", "item3"}
 	if !setsAreEqual(items, expected) {
 		t.Errorf("Items mismatch, got: %v, expected: %v.", items, expected)
 	}
@@ -85,7 +85,7 @@ func TestLWWSet_Remove(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	expected := []interface{}{"item1", "item2"}
+	expected := []string{"item1", "item2"}
 	if s.Exists(i) || !setsAreEqual(items, expected) {
 		t.Errorf("Extra item found, got: %v, expected: %v.", items, expected)
 	}

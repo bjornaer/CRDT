@@ -9,12 +9,12 @@ import (
 	graph "github.com/bjornaer/crdt/internal/graph"
 )
 
-func setupTestGraph() graph.LastWriterWinsGraph {
+func setupTestGraph() graph.LastWriterWinsGraph[string] {
 	v1 := "vertex1"
 	v2 := "vertex2"
 	v3 := "vertex3"
 
-	g := graph.NewLWWGraph()
+	g := graph.NewLWWGraph[string]()
 	g.AddVertex(v1)
 	g.AddVertex(v2)
 	g.AddVertex(v3)
@@ -24,7 +24,7 @@ func setupTestGraph() graph.LastWriterWinsGraph {
 }
 
 // compares generic but ordered interface slice to string slice - used for the findPath test cases purposes
-func pathsAreEqual(s1 []interface{}, s2 []string) bool {
+func pathsAreEqual[T comparable](s1, s2 []T) bool {
 	if len(s1) != len(s2) {
 		return false
 	}
@@ -37,7 +37,7 @@ func pathsAreEqual(s1 []interface{}, s2 []string) bool {
 }
 
 // checks element is contained within set
-func contains(s []interface{}, e interface{}) bool {
+func contains[T comparable](s []T, e T) bool {
 	for _, a := range s {
 		if a == e {
 			return true
@@ -47,7 +47,7 @@ func contains(s []interface{}, e interface{}) bool {
 }
 
 // checks for set equality -- independent of order
-func setsAreEqual(s1, s2 []interface{}) bool {
+func setsAreEqual[T comparable](s1, s2 []T) bool {
 	if len(s1) != len(s2) {
 		return false
 	}
@@ -81,7 +81,7 @@ func TestLWWGraph_GetAllVertices(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unexpected error: %v", err)
 	}
-	expected := []interface{}{"vertex1", "vertex2", "vertex3"}
+	expected := []string{"vertex1", "vertex2", "vertex3"}
 	if !setsAreEqual(vertices, expected) {
 		t.Errorf("Vertices mismatch, got: %v, expected: %v.", vertices, expected)
 	}
@@ -189,7 +189,7 @@ func TestLWWGraph_FindPath(t *testing.T) {
 	disconnectedG.RemoveEdge("vertex1", "vertex2")
 	tests := []struct {
 		name     string
-		graph    graph.LastWriterWinsGraph
+		graph    graph.LastWriterWinsGraph[string]
 		from     string
 		target   string
 		expected []string
