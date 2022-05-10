@@ -4,6 +4,8 @@
 package examples
 
 import (
+	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/bjornaer/crdt"
@@ -13,6 +15,7 @@ import (
 type DataManager struct {
 	Store *crdt.LastWriterWinsSet[string]
 	Peers []string
+	Self  string
 }
 
 type RequestBody struct {
@@ -22,6 +25,16 @@ type RequestBody struct {
 func (dm *DataManager) SyncWithPeers() {
 	otherSet := &crdt.LastWriterWinsSet{} // fetch it from peer
 	return dm.Store.Merge(otherSet)
+}
+
+func (dm *DataManager) Hello(context *gin.Context) {
+	context.JSON(
+		http.StatusOK,
+		gin.H{
+			"code":  http.StatusOK,
+			"error": fmt.Sprintf("Welcome server %s", dm.Self),
+		},
+	)
 }
 
 func (dm *DataManager) GetRawData(context *gin.Context) {
