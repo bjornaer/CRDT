@@ -1,7 +1,7 @@
-//go:build examples
-// +build examples
+//go:build example
+// +build example
 
-package examples
+package main
 
 import (
 	"encoding/json"
@@ -16,7 +16,7 @@ import (
 )
 
 type DataManager struct {
-	Store *crdt.LastWriterWinsSet[string]
+	Store crdt.LastWriterWinsSet[string]
 	Peers []string
 	Self  string
 }
@@ -101,14 +101,14 @@ func (dm *DataManager) Hello(context *gin.Context) {
 }
 
 func (dm *DataManager) GetRawData(context *gin.Context) {
-	context.JSON(200, dm.Store)
+	context.JSON(200, dm.Store.GetRaw())
 }
 
 func (dm *DataManager) GetSyncedData(context *gin.Context) {
 	dm.SyncWithPeers()
 	items, err := dm.Store.Get()
 	if err != nil {
-		context.String(500, err)
+		context.Error(err)
 	}
 	context.JSON(200, items)
 }
@@ -119,11 +119,11 @@ func (dm *DataManager) AddData(context *gin.Context) {
 	if err := context.BindJSON(&reqBod); err != nil {
 		context.String(400, "Incorrect payload")
 	}
-	votePack, err := dm.Store.Add(reqBod.Item, time.Now())
+	err := dm.Store.Add(reqBod.Item, time.Now())
 	if err != nil {
-		context.String(500, err)
+		context.Error(err)
 	}
-	context.JSON(200, votePack)
+	context.JSON(201, reqBod.Item)
 }
 
 func (dm *DataManager) RemoveData(context *gin.Context) {
@@ -136,5 +136,5 @@ func (dm *DataManager) RemoveData(context *gin.Context) {
 	if err != nil {
 		context.String(500, "Something went wrong")
 	}
-	context.JSON(200)
+	context.Status(204)
 }

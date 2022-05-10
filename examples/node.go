@@ -1,7 +1,7 @@
-//go:build examples
-// +build examples
+//go:build example
+// +build example
 
-package examples
+package main
 
 import (
 	"log"

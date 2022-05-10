@@ -1,14 +1,14 @@
-//go:build examples
-// +build examples
+//go:build example
+// +build example
 
-package examples
+package main
 
 import (
 	"github.com/gin-gonic/gin"
 )
 
 func addRoutes(r *gin.Engine, dm *DataManager) {
-	r.GET("/", hello)
+	r.GET("/", dm.Hello)
 	r.GET("/raw", dm.GetRawData)
 	r.GET("/item", dm.GetSyncedData)
 	r.POST("/item", dm.AddData)
