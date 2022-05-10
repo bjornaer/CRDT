@@ -33,14 +33,14 @@ func router02(dm *DataManager) http.Handler {
 
 func main() {
 
-	dataMgmt01 := &DataManager{Store: crdt.NewLWWSet[string](), Peers: {"8081"}, Self: "01"}
+	dataMgmt01 := &DataManager{Store: crdt.NewLWWSet[string](), Peers: []string{"8081"}, Self: "01"}
 	server01 := &http.Server{
 		Addr:         ":8080",
 		Handler:      router01(dataMgmt01),
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
 	}
-	dataMgmt02 := &DataManager{Store: crdt.NewLWWSet[string](), Peers: {"8080"}, Self: "02"}
+	dataMgmt02 := &DataManager{Store: crdt.NewLWWSet[string](), Peers: []string{"8080"}, Self: "02"}
 	server02 := &http.Server{
 		Addr:         ":8081",
 		Handler:      router02(dataMgmt02),

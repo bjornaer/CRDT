@@ -1,0 +1,1 @@
+I want to give credit for the Peer Sync logic to [el10savio](https://github.com/el10savio/twoPSet-crdt) from whom I took a lot of inspiration to write this example
