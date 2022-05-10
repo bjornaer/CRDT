@@ -42,6 +42,17 @@ The `Time Map` is an abstraction of a Go Map in which we only allow the operatio
 and map those elements to a timestamp in the moment of the addition.
 Thus, only allowing items to be added to both the `Adittions` and `Removals` set.
 
+### Examples
+
+Please see the [examples folder](examples/README.md)
+### Run tests
+
+To run tests
+
+```go
+go test ./...
+```
+
 ### Roadmap
 
 I intend on adding support for a more varied options of backends such as Redis
@@ -52,14 +63,6 @@ I also intend on keep adding more types of CRDTs to be used besides the `LWW-Set
 To read documentation on the public API [can be found here](https://pkg.go.dev/github.com/bjornaer/crdt)
 
 ---
-
-### Run tests
-
-To run tests
-
-```go
-go test ./...
-```
 
 ### Bibliography
 

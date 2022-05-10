@@ -11,6 +11,7 @@ type LastWriterWinsSet[T comparable] interface {
 	Remove(T, time.Time) error
 	Exists(T) bool
 	Get() ([]T, error)
+	GetRaw() LastWriterWinsSet[T]
 	Merge(LastWriterWinsSet[T]) error
 	getAdditions() backends.TimeSet[T]
 	getRemovals() backends.TimeSet[T]
@@ -20,6 +21,10 @@ type LastWriterWinsSet[T comparable] interface {
 type LWWSet[T comparable] struct {
 	additions backends.TimeSet[T]
 	removals  backends.TimeSet[T]
+}
+
+func (s *LWWSet[T]) GetRaw() LastWriterWinsSet[T] {
+	return s
 }
 
 // Add marks an element to be added at a given timestamp
