@@ -13,14 +13,14 @@ type LastWriterWinsSet[T comparable] interface {
 	Get() ([]T, error)
 	GetRaw() LastWriterWinsSet[T]
 	Merge(LastWriterWinsSet[T]) error
-	getAdditions() backends.TimeSet[T]
-	getRemovals() backends.TimeSet[T]
+	GetAdditions() backends.TimeSet[T]
+	GetRemovals() backends.TimeSet[T]
 }
 
 // LWWSet is a Last-Writer-Wins Set implementation
 type LWWSet[T comparable] struct {
-	additions backends.TimeSet[T]
-	removals  backends.TimeSet[T]
+	Additions backends.TimeSet[T] `json:"additions"`
+	Removals  backends.TimeSet[T] `json:"removals"`
 }
 
 func (s *LWWSet[T]) GetRaw() LastWriterWinsSet[T] {
@@ -29,25 +29,25 @@ func (s *LWWSet[T]) GetRaw() LastWriterWinsSet[T] {
 
 // Add marks an element to be added at a given timestamp
 func (s *LWWSet[T]) Add(value T, t time.Time) error {
-	return s.additions.Add(value, t)
+	return s.Additions.Add(value, t)
 }
 
-func (s *LWWSet[T]) getAdditions() backends.TimeSet[T] {
-	return s.additions
+func (s *LWWSet[T]) GetAdditions() backends.TimeSet[T] {
+	return s.Additions
 }
 
 // Remove marks an element to be removed at a given timestamp
 func (s *LWWSet[T]) Remove(value T, t time.Time) error {
-	return s.removals.Add(value, t)
+	return s.Removals.Add(value, t)
 }
 
-func (s *LWWSet[T]) getRemovals() backends.TimeSet[T] {
-	return s.removals
+func (s *LWWSet[T]) GetRemovals() backends.TimeSet[T] {
+	return s.Removals
 }
 
 // Exists checks if an element is marked as present in the set
 func (s *LWWSet[T]) Exists(value T) bool {
-	addedAt, added := s.additions.AddedAt(value)
+	addedAt, added := s.Additions.AddedAt(value)
 
 	removed := s.isRemoved(value, addedAt)
 
@@ -56,7 +56,7 @@ func (s *LWWSet[T]) Exists(value T) bool {
 
 // isRemoved checks if an element is marked for removal
 func (s *LWWSet[T]) isRemoved(value T, since time.Time) bool {
-	removedAt, removed := s.removals.AddedAt(value)
+	removedAt, removed := s.Removals.AddedAt(value)
 
 	if !removed {
 		return false
@@ -71,7 +71,7 @@ func (s *LWWSet[T]) isRemoved(value T, since time.Time) bool {
 func (s *LWWSet[T]) Get() ([]T, error) {
 	var result []T
 
-	err := s.additions.Each(func(element T, addedAt time.Time) error {
+	err := s.Additions.Each(func(element T, addedAt time.Time) error {
 		removed := s.isRemoved(element, addedAt)
 
 		if !removed {
@@ -89,7 +89,7 @@ func (s *LWWSet[T]) Get() ([]T, error) {
 
 // Merge additions and removals from other LWWSet into current set
 func (s *LWWSet[T]) Merge(other LastWriterWinsSet[T]) error {
-	err := other.getAdditions().Each(func(element T, addedAt time.Time) error {
+	err := other.GetAdditions().Each(func(element T, addedAt time.Time) error {
 		err := s.Add(element, addedAt)
 		if err != nil {
 			return err
@@ -101,7 +101,7 @@ func (s *LWWSet[T]) Merge(other LastWriterWinsSet[T]) error {
 		return err
 	}
 
-	err = other.getRemovals().Each(func(element T, addedAt time.Time) error {
+	err = other.GetRemovals().Each(func(element T, addedAt time.Time) error {
 		err := s.Remove(element, addedAt)
 		if err != nil {
 			return err
@@ -119,7 +119,7 @@ func (s *LWWSet[T]) Merge(other LastWriterWinsSet[T]) error {
 // NewLWWSet returns an implementation of a LastWriterWinsSet
 func NewLWWSet[T comparable]() LastWriterWinsSet[T] {
 	return &LWWSet[T]{
-		additions: backends.NewTimeSet[T](),
-		removals:  backends.NewTimeSet[T](),
+		Additions: backends.NewTimeSet[T](),
+		Removals:  backends.NewTimeSet[T](),
 	}
 }

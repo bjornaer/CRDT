@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -64,8 +65,12 @@ func SendCRDTRequest(peer string) (crdt.LastWriterWinsSet[string], error) {
 	}
 
 	// Decode the peer's LWW Set to be usable by our local LWW Set
-	var lwwSet crdt.LastWriterWinsSet[string]
-	err = json.NewDecoder(response.Body).Decode(&lwwSet)
+	lwwSet := crdt.NewLWWSet[string]()
+	bodyBytes, err := io.ReadAll(response.Body)
+    if err != nil {
+        log.Fatal(err)
+    }
+	err = json.Unmarshal(bodyBytes, &lwwSet)
 	if err != nil {
 		return _lwwSet, err
 	}
@@ -101,7 +106,7 @@ func (dm *DataManager) Hello(context *gin.Context) {
 }
 
 func (dm *DataManager) GetRawData(context *gin.Context) {
-	context.JSON(200, dm.Store.GetRaw())
+	context.JSON(200, dm.Store)
 }
 
 func (dm *DataManager) GetSyncedData(context *gin.Context) {

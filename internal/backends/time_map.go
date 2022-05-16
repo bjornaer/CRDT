@@ -9,11 +9,12 @@ type TimeSet[T comparable] interface {
 	Add(T, time.Time) error
 	AddedAt(T) (time.Time, bool)
 	Each(func(T, time.Time) error) error
+	Size() int
 }
 
 // TimeMap is an implementation of a timeSet that uses a map data structure. We map items to timestamps.
 type TimeMap[T comparable] struct {
-	elements map[T]time.Time
+	Elements map[T]time.Time `json:"elements"`
 	mutex    sync.RWMutex // Maps in Go are not thread safe by default and that's why we use a mutex
 }
 
@@ -23,9 +24,9 @@ type TimeMap[T comparable] struct {
 func (s *TimeMap[T]) Add(value T, t time.Time) error {
 	s.mutex.Lock()
 	defer s.mutex.Unlock()
-	addedAt, ok := s.elements[value]
+	addedAt, ok := s.Elements[value]
 	if !ok || (ok && t.After(addedAt)) {
-		s.elements[value] = t
+		s.Elements[value] = t
 	}
 	return nil
 }
@@ -37,7 +38,7 @@ func (s *TimeMap[T]) Add(value T, t time.Time) error {
 func (s *TimeMap[T]) AddedAt(value T) (time.Time, bool) {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	t, ok := s.elements[value]
+	t, ok := s.Elements[value]
 	return t, ok
 }
 
@@ -46,7 +47,7 @@ func (s *TimeMap[T]) AddedAt(value T) (time.Time, bool) {
 func (s *TimeMap[T]) Each(f func(element T, addedAt time.Time) error) error {
 	s.mutex.RLock()
 	defer s.mutex.RUnlock()
-	for element, addedAt := range s.elements {
+	for element, addedAt := range s.Elements {
 		err := f(element, addedAt)
 		if err != nil {
 			return err
@@ -55,9 +56,19 @@ func (s *TimeMap[T]) Each(f func(element T, addedAt time.Time) error) error {
 	return nil
 }
 
+func (s *TimeMap[T]) Size() int {
+	size := 0
+	s.mutex.RLock()
+	defer s.mutex.RUnlock()
+	for range s.Elements {
+		size++
+	}
+	return size
+}
+
 // newTimeSet returns an empty map-backed implementation of the time set interface
 func NewTimeSet[T comparable]() TimeSet[T] {
 	return &TimeMap[T]{
-		elements: make(map[T]time.Time),
+		Elements: make(map[T]time.Time),
 	}
 }
