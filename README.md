@@ -55,8 +55,10 @@ go test ./...
 
 ### Roadmap
 
-I intend on adding support for a more varied options of backends such as Redis
-I also intend on keep adding more types of CRDTs to be used besides the `LWW-Set` and `LWW-Graph`
+- Add support for `redis` as backend instead of in memory map
+- Add support for `etcd` as backend
+- Expand Set options opf CRDTs to include 2P-Sets
+- Expand Graph options to use 2P-sets as vertices
 
 ---
 **NOTE**
